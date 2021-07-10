@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ # The Release.Name Helm built-in object is called and utilized a prepend in
+ # the naming of the Kubernetes Deployment
+ # The Release Name will come from the name provided when the Helm Release is
+ # provoked via the Helm CLI command of "helm install <release-name>"
+ name: {{ .Release.Name }}-deployment
+spec:
+ selector:
+   matchLabels:
+     app: nginx
+ replicas: 2 # tells deployment to run 2 pods matching the template
+ template:
+   metadata:
+     labels:
+       app: nginx
+   spec:
+     containers:
+     - name: nginx
+       image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+       ports:
+       - containerPort: 80

@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ 
+name: {{ .Release.Name }}-nginx
+spec:
+selector:
+  matchLabels:
+    app: nginx
+# The Else/If blocks below have the following logic:
+# First an if statement checks the values.yaml file and a key of "devEnv"
+# Within the "devEnv" key exists a enabled key which is set to either true
+# or false.  If the "enabled" key is set to true - we have confirmation that
+# this is a development environment, set the number of Kubernetes replicas to
+# 2 and then stop processing the conditional block.
+# Second - if devEnv.enabled is false - logic determines if the values.yaml
+# prodEnv > enabled key is set to true.  If the value is true - we have
+# confirmation that the environment is production and set the number of
+# Kubernetes replicas/pids to 4.
+# Finally if neither devEnv.enabled nor prodEnv.enables is set to true - we
+# the environment is unknown and we set the Kubernetes replica/pod count to 1.
+{{ if .Values.devEnv.enabled }}
+replicas: 2
+{{ else if .Values.prodEnv.enabled }}
+replicas: 4
+{{ else }}
+replicas: 1
+{{ end }}
+template:
+  metadata:
+    labels:
+      app: nginx
+  spec:
+    containers:
+    - name: nginx
+      image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+      ports:
+      - containerPort: 80

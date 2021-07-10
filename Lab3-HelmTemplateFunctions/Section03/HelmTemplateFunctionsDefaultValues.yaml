@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ # The Release.Name Helm built-in object example from prior section
+ # remains in use
+ name: {{ .Release.Name }}-nginx
+spec:
+ selector:
+   matchLabels:
+     app: nginx
+ # The replicas key is provided a default value of 3
+ # The logic of the default function will be as follows:
+ # First the manifest will determine if the user explictly set the number of
+ # replicas via the --set switch (I.e. --set replicaCount=5).  If the --set
+ # switch is used it will supercede the values.yaml and the default value
+ # Second if no --set switch is specified the manifest will attempt to gather the
+ # value from the values.yaml file and will utilize that value if present
+ # Third if no value is provided by the --set switch nor is there a replicaCount
+ # key-value pair in values.yaml only then will the default function and value be
+ # utilized
+ replicas: {{ .Values.replicaCount | default 3 }}
+ template:
+   metadata:
+     labels:
+       app: nginx
+   spec:
+     containers:
+     - name: nginx
+       image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+       ports:
+       - containerPort: 80

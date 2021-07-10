@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # In this example usage of Helm template functions - the name tag of
+  # the Kubernetes deployment will be derived from "nginx-deployment"
+  # (static sting) PLUS a UUID (Univerally Unique Identifier)
+  # The use of this function would allow the template to be used
+  # many times with a unique deployment name on each invoke
+  # Reference the folllowing doc for the date template function and many more:
+  # https://masterminds.github.io/sprig/
+  name: nginx-deployment-{{ uuidv4 }}
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          ports:
+            - containerPort: 80

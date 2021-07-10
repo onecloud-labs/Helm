@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ # The Release.Name Helm built-in object example from prior section
+ # remains in use
+ name: {{ .Release.Name }}-deployment
+spec:
+ selector:
+   matchLabels:
+     app: nginx
+ # The Values file key of replicaCount will be fetched by Helm from
+ # the values.yaml file
+ # In the example replicaCount will be set to 5 in values.yaml and
+ # thus we will observe five (5) NGINX replicas created in Kubernetes
+ # when "helm install" provokes the release
+ replicas: {{ .Values.replicaCount }}
+ template:
+   metadata:
+     labels:
+       app: nginx
+   spec:
+     containers:
+     - name: nginx
+       image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+       ports:
+       - containerPort: 80

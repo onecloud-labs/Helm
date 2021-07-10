@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # In this example usage of Helm template functions and associated pipelines -
+  # the name tag of the Kubernetes deployment will be derived from "nginx-deployment"
+  # (static sting) PLUS the Date/Time of the execution
+  # Function pipelines are used in the following exectuion otder:
+  # STEP 1 - the Date funtion of now is used to derive the current Date/Time
+  # STEP 2 - the current Date/Time is piped to a date formatting function and in
+  # in this use case the requested format is specified as YEAR-MONTH-DAY
+  # and HOUR-MINUTE-SECONDS.  The letter "T" is used as a demarcation between the date
+  # and time.  The -0700 portion indicates that the time zone of the computer executing
+  # the opration should be used in the calculation of the current time.
+  # STEP 3 - the Date/Time is then piped to a lower function.  This is necessary as the
+  # Kubernetes cluster would reject the capital T in the deployment name (must be all)
+  # lower case letters and thus we force all characters to lower case.
+  # The use of this function would allow the template to be used
+  # many times with a unique deployment name on each invoke
+  # Reference the folllowing doc for the date template function and many more:
+  # https://masterminds.github.io/sprig/
+  name: nginx-deployment-{{ now | date "2006-01-02T15-04-05-0700" | lower }}
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          ports:
+            - containerPort: 80
