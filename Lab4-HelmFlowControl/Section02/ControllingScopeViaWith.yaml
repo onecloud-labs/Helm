@@ -1,42 +1,39 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-nginx
+ name: {{ .Release.Name }}-nginx
 spec:
-selector:
-  matchLabels:
-    app: nginx
-replicas: 2
-template:
-  metadata:
-    labels:
+ selector:
+   matchLabels:
      app: nginx
-     # The "with" variable scope control structure is utilized in the formation
-     # of Kubernetes pod labels.  Labels are used extensively in Kubernetes to
-     # control routing of traffic to specific, matched pods and other use cases.
-     # The with usage in this example changes the current scope from "." -
-     # which refers to the current working directory - to ".Values.tags"
-     # The advantage of the change in scope - in this case - is a simplification
-     # and shortening of the reference paths.  In other words - prior the intro
-     # of "with" if would be necessary to refer to elements in the values.yaml
-     # file as ".Values.tags.managedby" - per the first example below.  But post
-     # the introof "with" the configuration becomes shorter and more concise as we
-     # change the scope to ".Values.tags" and then may refernce simply ".managedby"
-     # as that varaible is contained with the newly defined scope (.Values.tags)
-     # There are many other use cases for controlling the current scope - I.e.
-     # possible variable naming overlaps, controlling what scope a manifest has
-     # access to, etc.
-     # But this simplistic use case provides a clarifying example of how we many
-     # change the scope and the power of doing so.
-     {{- with .Values.tags }}
-     ManagedBy: {{ .managedby | default "Terraform" | quote }}
-     Version: {{ .version | quote }}
-     StorageType: {{ .storage | upper | quote }}
-     {{- end }}
- 
-  spec:
-    containers:
-    - name: nginx
-      image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-      ports:
-      - containerPort: 80
+ replicas: 2
+ template:
+   metadata:
+     labels:
+      app: nginx
+      # The with usage in this example changes the current scope from "." -
+      # which refers to the current working directory - to ".Values.tags"
+      # The advantage of the change in scope - in this case - is a simplification
+      # and shortening of the reference paths.  In other words - prior the intro
+      # of "with" if would be necessary to refer to elements in the values.yaml 
+      # file as ".Values.tags.managedby" - per the first example below.  But post 
+      # the introof "with" the configuration becomes shorter and more concise as we 
+      # change the scope to ".Values.tags" and then may refernce simply ".managedby" 
+      # as that varaible is contained with the newly defined scope (.Values.tags)
+      # There are many other use cases for controlling the current scope - I.e. 
+      # possible variable naming overlaps, controlling what scope a manifest has 
+      # access to, etc.
+      # But this simplistic use case provides a clarifying example of how we many 
+      # change the scope and the power of doing so.
+      {{- with .Values.tags }}
+      ManagedBy: {{ .managedby | default "Terraform" | quote }}
+      Version: {{ .version | quote }}
+      StorageType: {{ .storage | upper | quote }}
+      {{- end }}
+
+   spec:
+     containers:
+     - name: nginx
+       image: nginx:1.14.2
+       ports:
+       - containerPort: 80
