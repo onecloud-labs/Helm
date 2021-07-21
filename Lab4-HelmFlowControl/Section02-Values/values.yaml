@@ -1,0 +1,10 @@
+tags:
+  managedby: helm
+  version: 1.16.0
+  storage: ssd
+
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
