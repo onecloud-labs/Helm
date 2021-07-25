@@ -11,20 +11,22 @@ spec:
    metadata:
      labels:
       app: nginx
-      # The with usage in this example changes the current scope from "." -
+      # The "with" usage in this example changes the current scope from "." -
       # which refers to the current working directory - to ".Values.tags"
       # The advantage of the change in scope - in this case - is a simplification
-      # and shortening of the reference paths.  In other words - prior the intro
-      # of "with" if would be necessary to refer to elements in the values.yaml 
-      # file as ".Values.tags.managedby" - per the first example below.  But post 
-      # the introof "with" the configuration becomes shorter and more concise as we 
-      # change the scope to ".Values.tags" and then may refernce simply ".managedby" 
+      # and shortening of the reference paths.  In other words - prior to the intro
+      # of "with" it would be necessary to refer to the elements in the values.yaml 
+      # file as ".Values.tags.managedby".  But post the intro of "with" 
+      # the configuration becomes shorter and more concise as we 
+      # change the scope to ".Values.tags" and then may reference simply ".managedby" (I.e.)
       # as that varaible is contained with the newly defined scope (.Values.tags)
       # There are many other use cases for controlling the current scope - I.e. 
       # possible variable naming overlaps, controlling what scope a manifest has 
       # access to, etc.
-      # But this simplistic use case provides a clarifying example of how we many 
+      # But this simplistic use case provides a clarifying example of how we may 
       # change the scope and the power of doing so.
+      # Note additionally that this block utilizes many of the concepts covered prior - I.e.
+      # default variables, functon pipes, build-in functions.
       {{- with .Values.tags }}
       ManagedBy: {{ .managedby | default "Terraform" | quote }}
       Version: {{ .version | quote }}
